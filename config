@@ -10,7 +10,7 @@
 # Please see https://i3wm.org/docs/userguide.html for a complete reference!
   
 
-set $mod Mod4
+set $mod Mod1
 
 # color themes
 # class                 border  bground text    indicator child_border
@@ -47,8 +47,7 @@ exec always nitrogen --restore
 # NetworkManager is the most popular way to manage wireless networks on Linux,
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
-exec --no-startup-id feh --bg-scale --zoom '~/home/arkar/Downloads/wallpaper/supergirl.jpg'
-# Use pactl to adjust volume in PulseAudio.
+
 set $refresh_i3status killall -SIGUSR1 i3status
 
 
@@ -213,37 +212,6 @@ bar {
 
 }
 
-## Volume control
-
-# Path to volume control, without trailing slash
-set $volumepath ~/i3-volume
-
-# Command for the status line
-#   ie: i3blocks, i3status
-set $statuscmd i3status
-
-# Signal used to update the status line
-#   i3blocks uses SIGRTMIN+10 by default
-#   i3status uses SIGUSR1 by default
-set $statussig SIGUSR1
-
-# Amount to increase/decrease volume as a percentage
-set $volumestep 5
-
-# alsa-utils settings
-#
-# To configure a default card, see https://www.alsa-project.org/main/index.php/Asoundrc
-#
-# Card number to control.
-#   If not specified, i3-volume will let `amixer` use a default.
-#   List cards: aplay -l
-#set $alsacard 1
-
-# append "-c $alsacard" without quotes to override default card
-bindsym XF86AudioRaiseVolume exec --no-startup-id $volumepath/volume -an -t $statuscmd -u $statussig up $volumestep
-bindsym XF86AudioLowerVolume exec --no-startup-id $volumepath/volume -an -t $statuscmd -u $statussig down $volumestep
-bindsym XF86AudioMute        exec --no-startup-id $volumepath/volume -an -t $statuscmd -u $statussig mute
-
 # borders
 smart_borders on
 default_border pixel 2
@@ -252,11 +220,6 @@ default_border pixel 2
 # >>> Plasma Integration <<<
   # Try to kill the wallpaper set by Plasma (it takes up the entire workspace and hides everything)
   
-exec --no-startup-id wmctrl -c Plasma
-for_window [title="Desktop — Plasma"] kill; floating enable; border none
-
-# Compositor (Animations, Shadows, Transparency)
-exec --no-startup-id picom -cCFb
 
 # >>> Window rules <<<
 # >>> Avoid tiling Plasma popups, dropdown windows, etc. <<<
@@ -283,3 +246,34 @@ for_window [window_role="About"] floating enable
 for_window [window_type="dialog"] floating enable
 for_window [window_type="menu"] floating enable
 for_window [instance="__scratchpad"] floating enable
+
+# Review the lines below and append to ~/.config/i3/config
+
+## Volume control
+
+# Path to volume control, without trailing slash
+set $volumepath ~/i3-volume
+
+# Command for the status line
+#   ie: i3blocks, i3status
+set $statuscmd i3status
+
+# Signal used to update the status line
+#   i3blocks uses SIGRTMIN+10 by default
+#   i3status uses SIGUSR1 by default
+set $statussig SIGUSR1
+
+# Amount to increase/decrease volume as a percentage
+set $volumestep 5
+
+# pulseaudio-utils settings
+#
+# Symbolic name for sink (numeric index not supported)
+#   Recommended: comment out this setting and omit the -s option to use default sink
+#   List sink names: pacmd list-sinks | awk -F "[<>]" '/^\s+name: <.*>/{print $2}'
+#set $sinkname alsa_output.pci-0000_00_1b.0.analog-stereo
+
+# Using pulseaudio-utils (append "-s $sinkname" without quotes to override default sink)
+bindsym XF86AudioRaiseVolume exec pactl set-sink-volume 0 +5% #increase sound volume
+bindsym XF86AudioLowerVolume exec pactl set-sink-volume 0 -5% #decrease sound volume
+bindsym XF86AudioMute exec pactl set-sink-mute 0 toggle # mute soun
